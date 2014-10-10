@@ -38229,7 +38229,15 @@ var Settings = React.createClass({displayName: 'Settings',
   },
 
   render: function () {
-    return React.DOM.div({className: "settings screen"});
+    return (
+      React.DOM.div({className: "settings screen"}, 
+        React.DOM.div({className: "vcent"}), 
+        React.DOM.div({className: "inner"}, 
+          React.DOM.h1(null, "Settings"), 
+          React.DOM.h2(null, "are not yet implemented.")
+        )
+      )
+    );
   }
 });
 
