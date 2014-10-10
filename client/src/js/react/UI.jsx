@@ -17,6 +17,7 @@ var UI = React.createClass({
       currentStageIndex: 0,
       currentStage: stages[0],
       currentTask: stages[0].title,
+      hints: stages[0].hints,
       brandColor: '#00b4ae',
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
@@ -74,6 +75,11 @@ var UI = React.createClass({
     });
   },
 
+  showHint: function () {
+    alert(this.state.hints[0] || 'There are no more hints for this stage');
+    this.setState({ hints: this.state.hints.slice(1) });
+  },
+
   advanceStage: function () {
     var nextStageIndex = this.state.currentStage + 1;
     var nextStage = stages[nextStageIndex];
@@ -81,7 +87,8 @@ var UI = React.createClass({
       currentStageIndex: nextStageIndex,
       currentStage: nextStage,
       cards: nextStage.cards,
-      currentTask: nextStage.title
+      currentTask: nextStage.title,
+      hints: nextStage.hints
     });
   },
 
@@ -106,7 +113,11 @@ var UI = React.createClass({
     return (
       // TODO: so jenky
       <div className={this.state.activeScreen + 'Active'}>
-        <TopBar showCards={this.showCards} timeRemaining={this.state.timeRemaining} currentTask={this.state.currentTask} />
+        <TopBar
+          showCards={this.showCards}
+          timeRemaining={this.state.timeRemaining}
+          currentTask={this.state.currentTask}
+          showHint={this.showHint} />
         <ScreenTabBar changeScreen={this.changeScreen} activeScreen={this.state.activeScreen} screens={this.state.currentStage.screens} />
         <Instruction />
         <Editor files={this.state.files} />

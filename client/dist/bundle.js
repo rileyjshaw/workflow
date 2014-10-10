@@ -38307,6 +38307,7 @@ var UI = React.createClass({displayName: 'UI',
       currentStageIndex: 0,
       currentStage: stages[0],
       currentTask: stages[0].title,
+      hints: stages[0].hints,
       brandColor: '#00b4ae',
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
@@ -38364,6 +38365,11 @@ var UI = React.createClass({displayName: 'UI',
     });
   },
 
+  showHint: function () {
+    alert(this.state.hints[0] || 'There are no more hints for this stage');
+    this.setState({ hints: this.state.hints.slice(1) });
+  },
+
   advanceStage: function () {
     var nextStageIndex = this.state.currentStage + 1;
     var nextStage = stages[nextStageIndex];
@@ -38371,7 +38377,8 @@ var UI = React.createClass({displayName: 'UI',
       currentStageIndex: nextStageIndex,
       currentStage: nextStage,
       cards: nextStage.cards,
-      currentTask: nextStage.title
+      currentTask: nextStage.title,
+      hints: nextStage.hints
     });
   },
 
@@ -38396,7 +38403,11 @@ var UI = React.createClass({displayName: 'UI',
     return (
       // TODO: so jenky
       React.DOM.div({className: this.state.activeScreen + 'Active'}, 
-        TopBar({showCards: this.showCards, timeRemaining: this.state.timeRemaining, currentTask: this.state.currentTask}), 
+        TopBar({
+          showCards: this.showCards, 
+          timeRemaining: this.state.timeRemaining, 
+          currentTask: this.state.currentTask, 
+          showHint: this.showHint}), 
         ScreenTabBar({changeScreen: this.changeScreen, activeScreen: this.state.activeScreen, screens: this.state.currentStage.screens}), 
         Instruction(null), 
         Editor({files: this.state.files}), 
@@ -38433,7 +38444,8 @@ module.exports = [
     title: 'Introduction: How many users?',
     screens: ['instruction', 'terminal', 'settings'],
     hints: [
-      'Use Curl'
+      'Use Curl',
+      'Check out the /users endpoint in the info pane'
     ],
     cards: [
       {

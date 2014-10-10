@@ -6,7 +6,8 @@ module.exports = [
     title: 'Introduction: How many users?',
     screens: ['instruction', 'terminal', 'settings'],
     hints: [
-      'Use Curl'
+      'Use Curl',
+      'Check out the /users endpoint in the info pane'
     ],
     cards: [
       {
