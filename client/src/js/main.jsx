@@ -27,7 +27,6 @@ window.addEventListener('load', function() {
 	socket.on('connect', function() {
 		console.log('connect');
 		socket.on('term', function(data) {
-			console.log(data);
 			term.write(data);
 		});
 		socket.on('event', function(data){});

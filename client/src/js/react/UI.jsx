@@ -7,17 +7,18 @@ var Editor = require('./Editor.jsx');
 var Terminal = require('./Terminal.jsx');
 var Settings = require('./Settings.jsx');
 var Backdrop = require('./Backdrop.jsx');
+var stages = require('../stages.jsx');
 
 var UI = React.createClass({
   getInitialState: function () {
     return {
-      activeScreen: 'editor',
+      activeScreen: 'instruction',
       timeRemaining: 11655,
-      currentTask: 'Introduction',
+      currentTask: stages[0].title,
       brandColor: '#00b4ae',
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
-      focusRegion: '.topBar',
+      focusRegion: null,
       files: [
         {
           name: 'index.js',
@@ -28,16 +29,8 @@ var UI = React.createClass({
           key: 2
         }
       ],
-      cards: [
-          [
-            <h1>Hi, Chris!</h1>,
-            <p>Ride by ride, we’re changing the way our world works. We imagine a world where cities feel small again. Where transportation and tech bring people together, instead of apart. We see the future as community-driven — and it starts with you.</p>,
-            <img src='img/moustache.png' alt='Lyft moustache' />
-          ], [
-            <p>With your background in <strong>Node.js</strong>, we think that you&#8217;ll make a great infrastructure engineer.</p>
-          ]
-      ],
-      activeCard: false
+      cards: stages[0].cards,
+      activeCard: 0
     };
   },
 
@@ -48,7 +41,7 @@ var UI = React.createClass({
         windowHeight: window.innerHeight,
         windowWidth: window.innerWidth
       });
-      if (this.activeCard !== false) this.refs.backdrop.draw();
+      if (this.state.activeCard !== null) this.refs.backdrop.draw();
     }).bind(this), 200);
   },
 
@@ -57,13 +50,34 @@ var UI = React.createClass({
   },
 
   startTimer: function () {
-    this.timer = setInterval((function () {
-      this.setState({ timeRemaining: this.state.timeRemaining - 1 })
-    }).bind(this), 1000);
+    if (!this.timer) {
+      this.timer = setInterval((function () {
+        this.setState({ timeRemaining: this.state.timeRemaining - 1 })
+      }).bind(this), 1000);
+    }
   },
 
   pauseTimer: function () {
     clearInterval(this.timer);
+  },
+
+  hideCards: function () {
+    this.setState({ activeCard: null });
+  },
+
+  showCards: function () {
+    this.setState({
+      activeCard: 0,
+      focusRegion: this.state.cards[0].focus
+    });
+  },
+
+  changeCard: function (amount) {
+    var newCard = this.state.activeCard + amount;
+    this.setState({
+      activeCard: newCard,
+      focusRegion: this.state.cards[newCard].focus
+    });
   },
 
   componentWillUnmount: function() {
@@ -74,30 +88,27 @@ var UI = React.createClass({
     this.setState({ activeScreen: screen })
   },
 
-  changeCard: function (amount) {
-    this.setState({ activeCard: this.state.activeCard + amount })
-  },
-
   render: function () {
     var activeCard = this.state.activeCard;
     return (
-      // so jenky
+      // TODO: so jenky
       <div className={this.state.activeScreen + 'Active'}>
-        <TopBar timeRemaining={this.state.timeRemaining} currentTask={this.state.currentTask} />
+        <TopBar showCards={this.showCards} timeRemaining={this.state.timeRemaining} currentTask={this.state.currentTask} />
         <ScreenTabBar changeScreen={this.changeScreen} activeScreen={this.state.activeScreen} />
         <Instruction />
         <Editor files={this.state.files} />
         <Terminal />
         <Settings />
-        {activeCard !== false ?
+        {activeCard !== null ?
           <Card
             startTimer={this.startTimer}
             pauseTimer={this.pauseTimer}
             changeCard={this.changeCard}
+            hideCards={this.hideCards}
             activeCard={activeCard === 0 ? 'first' : activeCard === this.state.cards.length - 1 ? 'last' : false} >
-            {this.state.cards[activeCard]}
+            {this.state.cards[activeCard].content}
           </Card> : ''}
-        {activeCard !== false ?
+        {activeCard !== null ?
           <Backdrop brandColor={this.state.brandColor}
             ref='backdrop'
             focusRegion={this.state.focusRegion}
