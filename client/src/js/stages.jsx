@@ -81,8 +81,19 @@ module.exports = [
     screens: ['instruction', 'editor', 'settings'],
     cards: [
       {
+        focus: '.timeRemaining',
         content: <div className='inner'>
-          <p>You are in the second set!</p>
+          <p>You got it! Nice!!</p>
+          <p>Your timer is paused while we go over the next instructions, so you can relax a little.</p>
+        </div>
+      },
+      {
+        focus: '.timeRemaining',
+        content: <div className='inner'>
+          <p>Now that you&#8217;re familiar with the Lyft API, let&#8217;s try adding to it.</p>
+          <p>For starters, let&#8217;s make a simple endpoint called <code>isThisLyft</code> that always returns the string <em><strong>YES</strong></em></p>
+          <p>We&#8217;re exposing a new <strong>editor pane</strong> so that you can play with the server. The API is written in express.</p>
+          <img src='img/editor.svg' alt='editor icon' />
         </div>
       }
     ]

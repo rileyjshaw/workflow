@@ -14,6 +14,8 @@ var Instruction = React.createClass({
         <h2>Endpoints</h2>
         <h3>/activeDrivers</h3>
         <p>Returns a JSON object containing a list of all currently active driver names</p>
+        {this.props.currentStageIndex === 1 ? <h3>/isThisLyft</h3> : ''}
+        {this.props.currentStageIndex === 1 ? <p>Returns the string YES</p> : ''}
         <h3>/locations</h3>
         <p>Returns a JSON object containing a list of all driver locations in the form:</p>
         <code><pre>{'{'}

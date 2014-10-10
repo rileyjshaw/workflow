@@ -52,6 +52,13 @@ var UI = React.createClass({
     window.addEventListener('resize', this.handleResize);
   },
 
+  componentDidUpdate: function (prevProps, prevState) {
+    if (prevState.currentStageIndex !== this.state.currentStageIndex) {
+      this.pauseTimer();
+      this.showCards();
+    }
+  },
+
   startTimer: function () {
     if (!this.timer) {
       this.timer = setInterval((function () {
@@ -62,6 +69,7 @@ var UI = React.createClass({
 
   pauseTimer: function () {
     clearInterval(this.timer);
+    this.timer = null;
   },
 
   hideCards: function () {
@@ -76,18 +84,19 @@ var UI = React.createClass({
   },
 
   showHint: function () {
-    alert(this.state.hints[0] || 'There are no more hints for this stage');
+    alert(this.state.hints && this.state.hints[0] || 'There are no more hints for this stage');
     this.setState({ hints: this.state.hints.slice(1) });
   },
 
   advanceStage: function () {
-    var nextStageIndex = this.state.currentStage + 1;
+    var nextStageIndex = this.state.currentStageIndex + 1;
     var nextStage = stages[nextStageIndex];
     this.setState({
+      activeScreen: 'instruction',
       currentStageIndex: nextStageIndex,
       currentStage: nextStage,
-      cards: nextStage.cards,
       currentTask: nextStage.title,
+      cards: nextStage.cards,
       hints: nextStage.hints
     });
   },
@@ -119,9 +128,9 @@ var UI = React.createClass({
           currentTask={this.state.currentTask}
           showHint={this.showHint} />
         <ScreenTabBar changeScreen={this.changeScreen} activeScreen={this.state.activeScreen} screens={this.state.currentStage.screens} />
-        <Instruction />
+        <Instruction currentStageIndex={this.state.currentStageIndex} />
         <Editor files={this.state.files} />
-        <Terminal />
+        <Terminal advanceStage={this.advanceStage} />
         <Settings />
         {activeCard !== null ?
           <Card

@@ -50,8 +50,7 @@ var Ace = React.createClass({
 
   render: function () {
     return (
-      <div id='ace'>
-      </div>
+      <div id='ace' />
     );
   }
 });
