@@ -8,20 +8,24 @@ var Backdrop = React.createClass({
 
   componentDidMount: function () {
   	this.ctx = this.getDOMNode().getContext('2d');
-    this.draw(this.props.focusRegion);
+    this.draw();
   },
 
-  draw: function (x, y, w, h) {
+  componentDidUpdate: function (prevProps) {
+    if (prevProps.focusRegion !== this.props.focusRegion) this.draw();
+  },
+
+  draw: function () {
   	this.ctx.fillStyle = this.props.brandColor;
     this.ctx.clearRect(0, 0, this.props.windowWidth, this.props.windowHeight);
     this.ctx.fillRect(0, 0, this.props.windowWidth, this.props.windowHeight);
-    if (typeof x === 'string') {
-      var pos, elements = document.querySelectorAll(x);
+    if (this.props.focusRegion) {
+      var pos, elements = document.querySelectorAll(this.props.focusRegion);
       for (var i = 0, _len = elements.length; i < _len; i++) {
         pos = elements[i].getBoundingClientRect();
         this.ctx.clearRect(pos.left, pos.top, pos.right - pos.left, pos.bottom - pos.top);
       }
-    } else if (typeof x === 'number') this.ctx.clearRect(x, y, w, h);
+    }
   },
 
   render: function () {

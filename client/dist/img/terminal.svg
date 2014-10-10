@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="INFO" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="100px" height="100px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
-<path fill="none" d="z"/>
-<path fill="none" d="z"/>
-<text transform="matrix(1 0 0 1 10.4912 72)" font-family="'NexaBold'" font-size="90">&gt;_</text>
+<svg version="1.1" id="Settings_1_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+	 y="0px" width="100px" height="100px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+<g>
+	<path fill="#333" d="M32.578,46.89L21.201,35.945v-0.432l5.688-5.617l16.562,16.417v1.08L26.89,63.812l-5.688-5.616v-0.432L32.578,46.89z"/>
+	<path fill="#333" d="M46.184,69.716h33.987v7.705H46.184V69.716z"/>
+</g>
 </svg>

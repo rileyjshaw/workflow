@@ -37955,20 +37955,24 @@ var Backdrop = React.createClass({displayName: 'Backdrop',
 
   componentDidMount: function () {
   	this.ctx = this.getDOMNode().getContext('2d');
-    this.draw(this.props.focusRegion);
+    this.draw();
   },
 
-  draw: function (x, y, w, h) {
+  componentDidUpdate: function (prevProps) {
+    if (prevProps.focusRegion !== this.props.focusRegion) this.draw();
+  },
+
+  draw: function () {
   	this.ctx.fillStyle = this.props.brandColor;
     this.ctx.clearRect(0, 0, this.props.windowWidth, this.props.windowHeight);
     this.ctx.fillRect(0, 0, this.props.windowWidth, this.props.windowHeight);
-    if (typeof x === 'string') {
-      var pos, elements = document.querySelectorAll(x);
+    if (this.props.focusRegion) {
+      var pos, elements = document.querySelectorAll(this.props.focusRegion);
       for (var i = 0, _len = elements.length; i < _len; i++) {
         pos = elements[i].getBoundingClientRect();
         this.ctx.clearRect(pos.left, pos.top, pos.right - pos.left, pos.bottom - pos.top);
       }
-    } else if (typeof x === 'number') this.ctx.clearRect(x, y, w, h);
+    }
   },
 
   render: function () {
@@ -37993,10 +37997,16 @@ var Card = React.createClass({displayName: 'Card',
     }).bind(this);
   },
 
+  beginChallenge: function () {
+    this.props.hideCards();
+    this.props.startTimer();
+  },
+
   render: function () {
     return (
       React.DOM.div({className: "card"}, 
         React.DOM.div({className: "cardContent"}, 
+          React.DOM.div({className: "vcent"}), 
           this.props.children
         ), 
         React.DOM.nav(null, 
@@ -38005,6 +38015,9 @@ var Card = React.createClass({displayName: 'Card',
           ), 
           React.DOM.button({className: "next", disabled: this.props.activeCard === 'last', onClick: this.changeCard(1)}, 
             "Next"
+          ), 
+          React.DOM.button({className: "go", disabled: this.props.activeCard !== 'last', onClick: this.beginChallenge}, 
+            "Begin"
           )
         )
       )
@@ -38111,7 +38124,23 @@ var Instruction = React.createClass({displayName: 'Instruction',
   },
 
   render: function () {
-    return React.DOM.div({className: "instruction screen"});
+    return (
+      React.DOM.div({className: "instruction screen"}, 
+        React.DOM.h1(null, "Lyft API, v0.0.0_alpha"), 
+        React.DOM.p(null, "The API is running internally at address ", React.DOM.code(null, "172.17.42.1"), ", port ", React.DOM.code(null, "49001"), "."), 
+        React.DOM.h2(null, "Endpoints"), 
+        React.DOM.h3(null, "/activeDrivers"), 
+        React.DOM.p(null, "Returns a JSON object containing a list of all currently active driver names"), 
+        React.DOM.h3(null, "/locations"), 
+        React.DOM.p(null, "Returns a JSON object containing a list of all driver locations in the form:"), 
+        React.DOM.code(null, React.DOM.pre(null, '{', 
+  "lat: 37.4524," + ' ' +
+  "long: -122.1161", 
+'}')), 
+        React.DOM.h3(null, "/users"), 
+        React.DOM.p(null, "Returns a JSON object containing a list of all user names currently using Lyft")
+      )
+    );
   }
 });
 
@@ -38208,8 +38237,11 @@ var TopBar = React.createClass({displayName: 'TopBar',
 
     return (
       React.DOM.div({className: "topBar"}, 
-        React.DOM.img({className: "logo", src: "img/logo.png", alt: "Lyft logo"}), 
-        React.DOM.p({className: "currentTask"}, this.props.currentTask), 
+        React.DOM.div({className: "left", onClick: this.props.showCards}, 
+          React.DOM.img({className: "logo", src: "img/logo.png", alt: "Lyft logo"}), 
+          React.DOM.p({className: "currentTask"}, this.props.currentTask)
+        ), 
+        React.DOM.button({className: "hintButton", onClick: this.props.showHint}, "Hint"), 
         React.DOM.p({className: "timeRemaining"}, "Time remaining: ", hours + minutes + seconds)
       )
     );
@@ -38228,17 +38260,18 @@ var Editor = require('./Editor.jsx');
 var Terminal = require('./Terminal.jsx');
 var Settings = require('./Settings.jsx');
 var Backdrop = require('./Backdrop.jsx');
+var stages = require('../stages.jsx');
 
 var UI = React.createClass({displayName: 'UI',
   getInitialState: function () {
     return {
       activeScreen: 'instruction',
       timeRemaining: 11655,
-      currentTask: 'Introduction',
+      currentTask: stages[0].title,
       brandColor: '#00b4ae',
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
-      focusRegion: '.topBar',
+      focusRegion: null,
       files: [
         {
           name: 'first.js',
@@ -38257,15 +38290,7 @@ var UI = React.createClass({displayName: 'UI',
           key: 4
         }
       ],
-      cards: [
-          [
-            React.DOM.h1(null, "Hi, Chris!"),
-            React.DOM.p(null, "Ride by ride, we’re changing the way our world works. We imagine a world where cities feel small again. Where transportation and tech bring people together, instead of apart. We see the future as community-driven — and it starts with you."),
-            React.DOM.img({src: "img/moustache.png", alt: "Lyft moustache"})
-          ], [
-            React.DOM.p(null, "With your background in ", React.DOM.strong(null, "Node.js"), ", we think that you’ll make a great infrastructure engineer.")
-          ]
-      ],
+      cards: stages[0].cards,
       activeCard: 0
     };
   },
@@ -38277,7 +38302,7 @@ var UI = React.createClass({displayName: 'UI',
         windowHeight: window.innerHeight,
         windowWidth: window.innerWidth
       });
-      if (this.activeCard !== false) this.refs.backdrop.draw();
+      if (this.state.activeCard !== null) this.refs.backdrop.draw();
     }).bind(this), 200);
   },
 
@@ -38286,13 +38311,34 @@ var UI = React.createClass({displayName: 'UI',
   },
 
   startTimer: function () {
-    this.timer = setInterval((function () {
-      this.setState({ timeRemaining: this.state.timeRemaining - 1 })
-    }).bind(this), 1000);
+    if (!this.timer) {
+      this.timer = setInterval((function () {
+        this.setState({ timeRemaining: this.state.timeRemaining - 1 })
+      }).bind(this), 1000);
+    }
   },
 
   pauseTimer: function () {
     clearInterval(this.timer);
+  },
+
+  hideCards: function () {
+    this.setState({ activeCard: null });
+  },
+
+  showCards: function () {
+    this.setState({
+      activeCard: 0,
+      focusRegion: this.state.cards[0].focus
+    });
+  },
+
+  changeCard: function (amount) {
+    var newCard = this.state.activeCard + amount;
+    this.setState({
+      activeCard: newCard,
+      focusRegion: this.state.cards[newCard].focus
+    });
   },
 
   componentWillUnmount: function() {
@@ -38303,30 +38349,27 @@ var UI = React.createClass({displayName: 'UI',
     this.setState({ activeScreen: screen })
   },
 
-  changeCard: function (amount) {
-    this.setState({ activeCard: this.state.activeCard + amount })
-  },
-
   render: function () {
     var activeCard = this.state.activeCard;
     return (
-      // so jenky
+      // TODO: so jenky
       React.DOM.div({className: this.state.activeScreen + 'Active'}, 
-        TopBar({timeRemaining: this.state.timeRemaining, currentTask: this.state.currentTask}), 
+        TopBar({showCards: this.showCards, timeRemaining: this.state.timeRemaining, currentTask: this.state.currentTask}), 
         ScreenTabBar({changeScreen: this.changeScreen, activeScreen: this.state.activeScreen}), 
         Instruction(null), 
         Editor({files: this.state.files}), 
         Terminal(null), 
         Settings(null), 
-        activeCard !== false ?
+        activeCard !== null ?
           Card({
             startTimer: this.startTimer, 
             pauseTimer: this.pauseTimer, 
             changeCard: this.changeCard, 
+            hideCards: this.hideCards, 
             activeCard: activeCard === 0 ? 'first' : activeCard === this.state.cards.length - 1 ? 'last' : false}, 
-            this.state.cards[activeCard]
+            this.state.cards[activeCard].content
           ) : '', 
-        activeCard !== false ?
+        activeCard !== null ?
           Backdrop({brandColor: this.state.brandColor, 
             ref: "backdrop", 
             focusRegion: this.state.focusRegion, 
@@ -38339,5 +38382,91 @@ var UI = React.createClass({displayName: 'UI',
 
 module.exports = UI;
 
-},{"./Backdrop.jsx":152,"./Card.jsx":153,"./Editor.jsx":154,"./Instruction.jsx":155,"./ScreenTabBar.jsx":156,"./Settings.jsx":157,"./Terminal.jsx":158,"./TopBar.jsx":159,"react":151}]},{},[1])(1)
+},{"../stages.jsx":161,"./Backdrop.jsx":152,"./Card.jsx":153,"./Editor.jsx":154,"./Instruction.jsx":155,"./ScreenTabBar.jsx":156,"./Settings.jsx":157,"./Terminal.jsx":158,"./TopBar.jsx":159,"react":151}],161:[function(require,module,exports){
+/** @jsx React.DOM */var React = require('react');
+
+// down the rabbit hole we go...
+module.exports = [
+  {
+    title: 'Introduction: How many users?',
+    cards: [
+      {
+        content: React.DOM.div({className: "inner"}, 
+          React.DOM.h1(null, "Hi, Chris!"), 
+          React.DOM.p(null, "Ride by ride, we’re changing the way our world works. We imagine a world where cities feel small again. Where transportation and tech bring people together, instead of apart. We see the future as community-driven — and it starts with you."), 
+          React.DOM.img({src: "img/moustache.png", alt: "Lyft moustache"})
+        )
+      }, {
+        content: React.DOM.div({className: "inner"}, 
+          React.DOM.p(null, "We’re working on Google scale engineering", React.DOM.br(null), "challenges with the speed of a startup."), 
+          React.DOM.p(null, "With your background in ", React.DOM.strong(null, "Node.js"), ", we think that", React.DOM.br(null), "you’ll make a great infrastructure engineer!"), 
+          React.DOM.p(null, "Today we’re going to walk you through a few situations that you might come across on the job.")
+        )
+      }, {
+        content: React.DOM.div({className: "inner"}, 
+        React.DOM.p(null, "Our infrastructure engineers work on:"), 
+          React.DOM.ul(null, 
+            React.DOM.li(null, "Race conditionsin a real-time server environment"), 
+            React.DOM.li(null, "Complex, predictive matching algorithms with machine learning"), 
+            React.DOM.li(null, "Custom recruitment, onboarding and scheduling tools"), 
+            React.DOM.li(null, "Integration with 3rd party services for identity, payment, notifications and monitoring"), 
+            React.DOM.li(null, "Optimizing data layout in a schema-less database environment")
+          ), 
+          React.DOM.p(null, "We code mostly in Python, but we can get you up to speed in no time.")
+        )
+      }, {
+        focus: '.instructionTab',
+        content: React.DOM.div({className: "inner"}, 
+          React.DOM.p(null, "Let’s start by trying out our API."), 
+          React.DOM.p(null, "When the clock starts, you’ll be able to see our API endpoints in the ", React.DOM.strong(null, "info pane"), " on the left."), 
+          React.DOM.img({src: "img/instruction.svg", alt: "instruction icon"})
+        )
+      }, {
+        focus: '.terminalTab',
+        content: React.DOM.div({className: "inner"}, 
+          React.DOM.p(null, "Use the terminal pane:"), 
+          React.DOM.img({src: "img/terminal.svg", alt: "terminal icon"}), 
+          React.DOM.p(null, "To figure out how many users Lyft currently has.")
+        )
+      }, {
+        focus: '.timeRemaining',
+        content: React.DOM.div({className: "inner"}, 
+          React.DOM.p(null, "Just a few more things before we get started..."), 
+          React.DOM.p(null, "Your remaining time is shown in the top right. We’ve given you over three hours to finish but most candidates don’t need that long.")
+        )
+      }, {
+        focus: '.hintButton',
+        content: React.DOM.div({className: "inner"}, 
+          React.DOM.p(null, "You can use the Hint button at any time to", React.DOM.br(null), "steer you in the right direction."), 
+          React.DOM.p(null, "Try to use it sparingly; we want to see how ", React.DOM.em(null, "you"), " solve problems.")
+        )
+      }, {
+        focus: '.topBar .left',
+        content: React.DOM.div({className: "inner"}, 
+          React.DOM.p(null, "If you ever need to see these cards again, just", React.DOM.br(null), "click the Lyft logo in the top left.")
+        )
+      }, {
+        focus: '.instructionTab, .terminalTab',
+        content: React.DOM.div({className: "inner"}, 
+          React.DOM.p(null, "Alright, time to get started!"), 
+          React.DOM.p(null, "Remember, we’re looking for ", React.DOM.strong(null, "how many users Lyft currently has"), ". Our API will be available at the internal address ", React.DOM.strong(null, "172.17.42.1"), " on port ", React.DOM.strong(null, "49100"), ". You’ll find everything else in the info pane."), 
+          React.DOM.img({src: "img/moustache.png", alt: "Lyft moustache"}), 
+          React.DOM.p(null, React.DOM.strong(null, "Good luck!"))
+        )
+      }
+    ]
+  },
+  {
+    title: 'Add an endpoint',
+    cards: [
+      {
+        content: React.DOM.div({className: "inner"}, 
+          React.DOM.p(null, "You are in the second set!")
+        )
+      }
+    ]
+  }
+];
+
+},{"react":151}]},{},[1])(1)
 });

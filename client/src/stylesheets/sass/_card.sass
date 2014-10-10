@@ -15,18 +15,30 @@
   .cardContent
     overflow: auto
     height: 480px - $topBarHeight
-    padding: 0 3em
+    box-sizing: border-box
+    padding: 0 5em
     box-shadow: 0 0 60px rgba($cbg - #111, 0.4) inset
 
+    .inner
+      display: inline-block
+      vertical-align: middle
+
   h1
+    margin-top: 0
     font-size: 2.5em
+
+  ul
+    text-align: left
+
+  li
+    margin: 0.5em 0
 
   nav
     position: absolute
     z-index: 3
     left: 0
     bottom: 0
-    height: 60px
+    height: $topBarHeight
     width: 100%
     background: $cbg
 
@@ -47,11 +59,22 @@
       &:disabled
         color: $cbg - #222
 
-      &:nth-child(2)
-        border-left: 1px solid $cbg - #111
+      &:nth-child(1)
+        border-right: 1px solid $cbg - #111
 
   .previous
     float: left
 
-  .next
+  .next, .go
     float: right
+
+    &:disabled
+      display: none
+
+  .go
+    @if lightness($cbrand2) < 66%
+      color: $cbg
+    @else
+      color: #333
+    background: $cbrand2
+    box-shadow: 0 0 60px rgba($cbrand2 - #111, 0.4) inset

@@ -21,8 +21,11 @@ var TopBar = React.createClass({
 
     return (
       <div className='topBar'>
-        <img className='logo' src='img/logo.png' alt='Lyft logo' />
-        <p className='currentTask'>{this.props.currentTask}</p>
+        <div className='left' onClick={this.props.showCards}>
+          <img className='logo' src='img/logo.png' alt='Lyft logo' />
+          <p className='currentTask'>{this.props.currentTask}</p>
+        </div>
+        <button className='hintButton' onClick={this.props.showHint}>Hint</button>
         <p className='timeRemaining'>Time remaining: {hours + minutes + seconds}</p>
       </div>
     );
