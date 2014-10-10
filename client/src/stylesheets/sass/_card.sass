@@ -10,12 +10,13 @@
   font-size: 24px
   text-align: center
   background: $cbg
+  box-shadow: 0 0 12px rgba(#000, 0.2)
 
   .cardContent
     overflow: auto
     height: 480px - $topBarHeight
     padding: 0 3em
-    box-shadow: 0 0 12px rgba(#000, 0.2), 0 0 60px rgba($cbg - #111, 0.4) inset
+    box-shadow: 0 0 60px rgba($cbg - #111, 0.4) inset
 
   h1
     font-size: 2.5em
@@ -31,6 +32,7 @@
 
     button
       height: 100%
+      line-height: $topBarHeight - 3px !important
       width: 50%
       box-sizing: border-box
       padding: 0
@@ -41,6 +43,9 @@
       background: transparent
       box-shadow: 0 0 60px rgba($cbg - #111, 0.4) inset
       cursor: pointer
+
+      &:disabled
+        color: $cbg - #222
 
       &:nth-child(2)
         border-left: 1px solid $cbg - #111

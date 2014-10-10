@@ -37954,10 +37954,21 @@ var Backdrop = React.createClass({displayName: 'Backdrop',
   },
 
   componentDidMount: function () {
-  	var ctx = this.getDOMNode().getContext('2d');
-  	ctx.fillStyle = this.props.brandColor;
-  	ctx.fillRect(0, 0, this.props.windowWidth, this.props.windowHeight);
-  	ctx.clearRect(0, 0, 72, 72);
+  	this.ctx = this.getDOMNode().getContext('2d');
+    this.draw(this.props.focusRegion);
+  },
+
+  draw: function (x, y, w, h) {
+  	this.ctx.fillStyle = this.props.brandColor;
+    this.ctx.clearRect(0, 0, this.props.windowWidth, this.props.windowHeight);
+    this.ctx.fillRect(0, 0, this.props.windowWidth, this.props.windowHeight);
+    if (typeof x === 'string') {
+      var pos, elements = document.querySelectorAll(x);
+      for (var i = 0, _len = elements.length; i < _len; i++) {
+        pos = elements[i].getBoundingClientRect();
+        this.ctx.clearRect(pos.left, pos.top, pos.right - pos.left, pos.bottom - pos.top);
+      }
+    } else if (typeof x === 'number') this.ctx.clearRect(x, y, w, h);
   },
 
   render: function () {
@@ -38227,6 +38238,7 @@ var UI = React.createClass({displayName: 'UI',
       brandColor: '#00b4ae',
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
+      focusRegion: '.topBar',
       files: [
         {
           name: 'first.js',
@@ -38259,20 +38271,28 @@ var UI = React.createClass({displayName: 'UI',
   },
 
   handleResize: function () {
-    this.setState({
-      windowHeight: window.innerHeight,
-      windowWidth: window.innerWidth
-    });
+    clearTimeout(this.resizer);
+    this.resizer = setTimeout((function () {
+      this.setState({
+        windowHeight: window.innerHeight,
+        windowWidth: window.innerWidth
+      });
+      if (this.activeCard !== false) this.refs.backdrop.draw();
+    }).bind(this), 200);
   },
 
   componentDidMount: function() {
     window.addEventListener('resize', this.handleResize);
   },
 
-  componentWillMount: function () {
+  startTimer: function () {
     this.timer = setInterval((function () {
       this.setState({ timeRemaining: this.state.timeRemaining - 1 })
     }).bind(this), 1000);
+  },
+
+  pauseTimer: function () {
+    clearInterval(this.timer);
   },
 
   componentWillUnmount: function() {
@@ -38294,16 +38314,24 @@ var UI = React.createClass({displayName: 'UI',
       React.DOM.div({className: this.state.activeScreen + 'Active'}, 
         TopBar({timeRemaining: this.state.timeRemaining, currentTask: this.state.currentTask}), 
         ScreenTabBar({changeScreen: this.changeScreen, activeScreen: this.state.activeScreen}), 
-        Card({
-          changeCard: this.changeCard, 
-          activeCard: activeCard === 0 ? 'first' : activeCard === this.state.cards.length - 1 ? 'last' : false}, 
-          this.state.cards[activeCard]
-        ), 
         Instruction(null), 
         Editor({files: this.state.files}), 
         Terminal(null), 
         Settings(null), 
-        Backdrop({brandColor: this.state.brandColor, windowHeight: this.state.windowHeight, windowWidth: this.state.windowWidth})
+        activeCard !== false ?
+          Card({
+            startTimer: this.startTimer, 
+            pauseTimer: this.pauseTimer, 
+            changeCard: this.changeCard, 
+            activeCard: activeCard === 0 ? 'first' : activeCard === this.state.cards.length - 1 ? 'last' : false}, 
+            this.state.cards[activeCard]
+          ) : '', 
+        activeCard !== false ?
+          Backdrop({brandColor: this.state.brandColor, 
+            ref: "backdrop", 
+            focusRegion: this.state.focusRegion, 
+            windowHeight: this.state.windowHeight, 
+            windowWidth: this.state.windowWidth}) : ''
       )
     );
   }

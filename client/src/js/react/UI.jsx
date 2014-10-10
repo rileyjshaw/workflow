@@ -17,6 +17,7 @@ var UI = React.createClass({
       brandColor: '#00b4ae',
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
+      focusRegion: '.topBar',
       files: [
         {
           name: 'first.js',
@@ -49,20 +50,28 @@ var UI = React.createClass({
   },
 
   handleResize: function () {
-    this.setState({
-      windowHeight: window.innerHeight,
-      windowWidth: window.innerWidth
-    });
+    clearTimeout(this.resizer);
+    this.resizer = setTimeout((function () {
+      this.setState({
+        windowHeight: window.innerHeight,
+        windowWidth: window.innerWidth
+      });
+      if (this.activeCard !== false) this.refs.backdrop.draw();
+    }).bind(this), 200);
   },
 
   componentDidMount: function() {
     window.addEventListener('resize', this.handleResize);
   },
 
-  componentWillMount: function () {
+  startTimer: function () {
     this.timer = setInterval((function () {
       this.setState({ timeRemaining: this.state.timeRemaining - 1 })
     }).bind(this), 1000);
+  },
+
+  pauseTimer: function () {
+    clearInterval(this.timer);
   },
 
   componentWillUnmount: function() {
@@ -84,16 +93,24 @@ var UI = React.createClass({
       <div className={this.state.activeScreen + 'Active'}>
         <TopBar timeRemaining={this.state.timeRemaining} currentTask={this.state.currentTask} />
         <ScreenTabBar changeScreen={this.changeScreen} activeScreen={this.state.activeScreen} />
-        <Card
-          changeCard={this.changeCard}
-          activeCard={activeCard === 0 ? 'first' : activeCard === this.state.cards.length - 1 ? 'last' : false} >
-          {this.state.cards[activeCard]}
-        </Card>
         <Instruction />
         <Editor files={this.state.files} />
         <Terminal />
         <Settings />
-        <Backdrop brandColor={this.state.brandColor} windowHeight={this.state.windowHeight} windowWidth={this.state.windowWidth} />
+        {activeCard !== false ?
+          <Card
+            startTimer={this.startTimer}
+            pauseTimer={this.pauseTimer}
+            changeCard={this.changeCard}
+            activeCard={activeCard === 0 ? 'first' : activeCard === this.state.cards.length - 1 ? 'last' : false} >
+            {this.state.cards[activeCard]}
+          </Card> : ''}
+        {activeCard !== false ?
+          <Backdrop brandColor={this.state.brandColor}
+            ref='backdrop'
+            focusRegion={this.state.focusRegion}
+            windowHeight={this.state.windowHeight}
+            windowWidth={this.state.windowWidth} /> : ''}
       </div>
     );
   }
