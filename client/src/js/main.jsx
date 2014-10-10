@@ -3,12 +3,14 @@
 var React = require('react');
 var UI = require('./react/ui.jsx');
 
+var socket = io('http://localhost:49000');
+window.socket = socket;
+
 React.renderComponent(
   <UI />,
   document.getElementById('app-container')
 );
 
-/*
 window.addEventListener('load', function() {
 	var term = new Terminal({
 		colors: Terminal.colors,
@@ -20,12 +22,11 @@ window.addEventListener('load', function() {
 		cursorBlink: false
 	});
 
-	term.open(document.body);
+	term.open(document.getElementById('terminal'));
 
-	var socket = io('http://localhost:49000');
 	socket.on('connect', function() {
 		console.log('connect');
-		socket.on('data', function(data) {
+		socket.on('term', function(data) {
 			console.log(data);
 			term.write(data);
 		});
@@ -34,7 +35,6 @@ window.addEventListener('load', function() {
 	});
 
 	term.on('data', function(data) {
-		socket.emit('data', data);
+		socket.emit('term', data);
 	});
 }, false);
-*/

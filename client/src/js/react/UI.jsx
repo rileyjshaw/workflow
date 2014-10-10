@@ -11,7 +11,7 @@ var Backdrop = require('./Backdrop.jsx');
 var UI = React.createClass({
   getInitialState: function () {
     return {
-      activeScreen: 'instruction',
+      activeScreen: 'editor',
       timeRemaining: 11655,
       currentTask: 'Introduction',
       brandColor: '#00b4ae',
@@ -20,20 +20,12 @@ var UI = React.createClass({
       focusRegion: '.topBar',
       files: [
         {
-          name: 'first.js',
+          name: 'index.js',
           key: 1
         },
         {
-          name: 'second.c',
+          name: 'package.json',
           key: 2
-        },
-        {
-          name: 'third.h',
-          key: 3
-        },
-        {
-          name: 'fourth.php',
-          key: 4
         }
       ],
       cards: [
@@ -45,7 +37,7 @@ var UI = React.createClass({
             <p>With your background in <strong>Node.js</strong>, we think that you&#8217;ll make a great infrastructure engineer.</p>
           ]
       ],
-      activeCard: 0
+      activeCard: false
     };
   },
 
