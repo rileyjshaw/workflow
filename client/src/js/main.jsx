@@ -36,4 +36,6 @@ window.addEventListener('load', function() {
 	term.on('data', function(data) {
 		socket.emit('term', data);
 	});
+
+	window.socket.emit('code', {filename: this.props.files[0].name});
 }, false);

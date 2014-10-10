@@ -14,7 +14,10 @@ var UI = React.createClass({
     return {
       activeScreen: 'instruction',
       timeRemaining: 11655,
+      currentStageIndex: 0,
+      currentStage: stages[0],
       currentTask: stages[0].title,
+      hints: stages[0].hints,
       brandColor: '#00b4ae',
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
@@ -49,6 +52,13 @@ var UI = React.createClass({
     window.addEventListener('resize', this.handleResize);
   },
 
+  componentDidUpdate: function (prevProps, prevState) {
+    if (prevState.currentStageIndex !== this.state.currentStageIndex) {
+      this.pauseTimer();
+      this.showCards();
+    }
+  },
+
   startTimer: function () {
     if (!this.timer) {
       this.timer = setInterval((function () {
@@ -59,6 +69,7 @@ var UI = React.createClass({
 
   pauseTimer: function () {
     clearInterval(this.timer);
+    this.timer = null;
   },
 
   hideCards: function () {
@@ -69,6 +80,24 @@ var UI = React.createClass({
     this.setState({
       activeCard: 0,
       focusRegion: this.state.cards[0].focus
+    });
+  },
+
+  showHint: function () {
+    alert(this.state.hints && this.state.hints[0] || 'There are no more hints for this stage');
+    this.setState({ hints: this.state.hints.slice(1) });
+  },
+
+  advanceStage: function () {
+    var nextStageIndex = this.state.currentStageIndex + 1;
+    var nextStage = stages[nextStageIndex];
+    this.setState({
+      activeScreen: 'instruction',
+      currentStageIndex: nextStageIndex,
+      currentStage: nextStage,
+      currentTask: nextStage.title,
+      cards: nextStage.cards,
+      hints: nextStage.hints
     });
   },
 
@@ -93,11 +122,15 @@ var UI = React.createClass({
     return (
       // TODO: so jenky
       <div className={this.state.activeScreen + 'Active'}>
-        <TopBar showCards={this.showCards} timeRemaining={this.state.timeRemaining} currentTask={this.state.currentTask} />
-        <ScreenTabBar changeScreen={this.changeScreen} activeScreen={this.state.activeScreen} />
-        <Instruction />
+        <TopBar
+          showCards={this.showCards}
+          timeRemaining={this.state.timeRemaining}
+          currentTask={this.state.currentTask}
+          showHint={this.showHint} />
+        <ScreenTabBar changeScreen={this.changeScreen} activeScreen={this.state.activeScreen} screens={this.state.currentStage.screens} />
+        <Instruction currentStageIndex={this.state.currentStageIndex} />
         <Editor files={this.state.files} />
-        <Terminal />
+        <Terminal advanceStage={this.advanceStage} />
         <Settings />
         {activeCard !== null ?
           <Card

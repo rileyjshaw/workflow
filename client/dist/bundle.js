@@ -37,6 +37,8 @@ window.addEventListener('load', function() {
 	term.on('data', function(data) {
 		socket.emit('term', data);
 	});
+
+     window.socket.emit('code', {filename: this.props.files[0].name});
 }, false);
 },{"./react/ui.jsx":160,"react":151}],2:[function(require,module,exports){
 /* ***** BEGIN LICENSE BLOCK *****
@@ -38109,8 +38111,7 @@ var Ace = React.createClass({displayName: 'Ace',
 
   render: function () {
     return (
-      React.DOM.div({id: "ace"}
-      )
+      React.DOM.div({id: "ace"})
     );
   }
 });
@@ -38121,7 +38122,6 @@ var Tree = React.createClass({displayName: 'Tree',
     },
 
     componentDidMount: function() {
-      window.socket.emit('code', {filename: this.props.files[0].name});
     },
 
     updateDoc: function (doc, filename) {
@@ -38168,6 +38168,8 @@ var Instruction = React.createClass({displayName: 'Instruction',
         React.DOM.h2(null, "Endpoints"), 
         React.DOM.h3(null, "/activeDrivers"), 
         React.DOM.p(null, "Returns a JSON object containing a list of all currently active driver names"), 
+        this.props.currentStageIndex === 1 ? React.DOM.h3(null, "/isThisLyft") : '', 
+        this.props.currentStageIndex === 1 ? React.DOM.p(null, "Returns the string YES") : '', 
         React.DOM.h3(null, "/locations"), 
         React.DOM.p(null, "Returns a JSON object containing a list of all driver locations in the form:"), 
         React.DOM.code(null, React.DOM.pre(null, '{', 
@@ -38199,7 +38201,7 @@ var ScreenTabBar = React.createClass({displayName: 'ScreenTabBar',
   },
 
   render: function () {
-    var tabs = ['instruction', 'editor', 'terminal', 'settings'].map((function (tabName) {
+    var tabs = this.props.screens.map((function (tabName) {
       return (
         React.DOM.li({
           onClick: this.changeScreen(tabName), 
@@ -38228,7 +38230,15 @@ var Settings = React.createClass({displayName: 'Settings',
   },
 
   render: function () {
-    return React.DOM.div({className: "settings screen"});
+    return (
+      React.DOM.div({className: "settings screen"}, 
+        React.DOM.div({className: "vcent"}), 
+        React.DOM.div({className: "inner"}, 
+          React.DOM.h1(null, "Settings"), 
+          React.DOM.h2(null, "are not yet implemented.")
+        )
+      )
+    );
   }
 });
 
@@ -38240,11 +38250,34 @@ var React = require('react');
 
 var Terminal = React.createClass({displayName: 'Terminal',
   getInitialState: function () {
-    return {};
+    return {
+      numUsers: ''
+    };
+  },
+
+  answer: function (e) {
+    e.preventDefault();
+    if (this.state.numUsers === '3003') {
+      this.props.advanceStage();
+    } else alert('Not quite!');
+    return false;
+  },
+
+  numUsersChange: function (e) {
+    this.setState({ numUsers: e.target.value });
   },
 
   render: function () {
-    return React.DOM.div({id: "terminal", className: "terminal screen"});
+    return (
+      React.DOM.div({className: "terminal screen"}, 
+        React.DOM.div({id: "terminal"}), 
+        React.DOM.form({onSubmit: this.answer}, 
+          React.DOM.label(null, "Number of users:"), 
+          React.DOM.input({type: "text", name: "numUsers", value: this.state.numUsers, onChange: this.numUsersChange}), 
+          React.DOM.input({type: "submit"})
+        )
+      )
+    );
   }
 });
 
@@ -38304,7 +38337,10 @@ var UI = React.createClass({displayName: 'UI',
     return {
       activeScreen: 'instruction',
       timeRemaining: 11655,
+      currentStageIndex: 0,
+      currentStage: stages[0],
       currentTask: stages[0].title,
+      hints: stages[0].hints,
       brandColor: '#00b4ae',
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
@@ -38339,6 +38375,13 @@ var UI = React.createClass({displayName: 'UI',
     window.addEventListener('resize', this.handleResize);
   },
 
+  componentDidUpdate: function (prevProps, prevState) {
+    if (prevState.currentStageIndex !== this.state.currentStageIndex) {
+      this.pauseTimer();
+      this.showCards();
+    }
+  },
+
   startTimer: function () {
     if (!this.timer) {
       this.timer = setInterval((function () {
@@ -38349,6 +38392,7 @@ var UI = React.createClass({displayName: 'UI',
 
   pauseTimer: function () {
     clearInterval(this.timer);
+    this.timer = null;
   },
 
   hideCards: function () {
@@ -38359,6 +38403,24 @@ var UI = React.createClass({displayName: 'UI',
     this.setState({
       activeCard: 0,
       focusRegion: this.state.cards[0].focus
+    });
+  },
+
+  showHint: function () {
+    alert(this.state.hints && this.state.hints[0] || 'There are no more hints for this stage');
+    this.setState({ hints: this.state.hints.slice(1) });
+  },
+
+  advanceStage: function () {
+    var nextStageIndex = this.state.currentStageIndex + 1;
+    var nextStage = stages[nextStageIndex];
+    this.setState({
+      activeScreen: 'instruction',
+      currentStageIndex: nextStageIndex,
+      currentStage: nextStage,
+      currentTask: nextStage.title,
+      cards: nextStage.cards,
+      hints: nextStage.hints
     });
   },
 
@@ -38383,11 +38445,15 @@ var UI = React.createClass({displayName: 'UI',
     return (
       // TODO: so jenky
       React.DOM.div({className: this.state.activeScreen + 'Active'}, 
-        TopBar({showCards: this.showCards, timeRemaining: this.state.timeRemaining, currentTask: this.state.currentTask}), 
-        ScreenTabBar({changeScreen: this.changeScreen, activeScreen: this.state.activeScreen}), 
-        Instruction(null), 
+        TopBar({
+          showCards: this.showCards, 
+          timeRemaining: this.state.timeRemaining, 
+          currentTask: this.state.currentTask, 
+          showHint: this.showHint}), 
+        ScreenTabBar({changeScreen: this.changeScreen, activeScreen: this.state.activeScreen, screens: this.state.currentStage.screens}), 
+        Instruction({currentStageIndex: this.state.currentStageIndex}), 
         Editor({files: this.state.files}), 
-        Terminal(null), 
+        Terminal({advanceStage: this.advanceStage}), 
         Settings(null), 
         activeCard !== null ?
           Card({
@@ -38418,6 +38484,11 @@ module.exports = UI;
 module.exports = [
   {
     title: 'Introduction: How many users?',
+    screens: ['instruction', 'terminal', 'settings'],
+    hints: [
+      'Use Curl',
+      'Check out the /users endpoint in the info pane'
+    ],
     cards: [
       {
         content: React.DOM.div({className: "inner"}, 
@@ -38487,10 +38558,22 @@ module.exports = [
   },
   {
     title: 'Add an endpoint',
+    screens: ['instruction', 'editor', 'settings'],
     cards: [
       {
+        focus: '.timeRemaining',
         content: React.DOM.div({className: "inner"}, 
-          React.DOM.p(null, "You are in the second set!")
+          React.DOM.p(null, "You got it! Nice!!"), 
+          React.DOM.p(null, "Your timer is paused while we go over the next instructions, so you can relax a little.")
+        )
+      },
+      {
+        focus: '.timeRemaining',
+        content: React.DOM.div({className: "inner"}, 
+          React.DOM.p(null, "Now that you’re familiar with the Lyft API, let’s try adding to it."), 
+          React.DOM.p(null, "For starters, let’s make a simple endpoint called ", React.DOM.code(null, "isThisLyft"), " that always returns the string ", React.DOM.em(null, React.DOM.strong(null, "YES"))), 
+          React.DOM.p(null, "We’re exposing a new ", React.DOM.strong(null, "editor pane"), " so that you can play with the server. The API is written in express."), 
+          React.DOM.img({src: "img/editor.svg", alt: "editor icon"})
         )
       }
     ]

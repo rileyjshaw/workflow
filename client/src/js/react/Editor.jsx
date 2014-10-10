@@ -50,8 +50,7 @@ var Ace = React.createClass({
 
   render: function () {
     return (
-      <div id='ace'>
-      </div>
+      <div id='ace' />
     );
   }
 });
@@ -62,7 +61,6 @@ var Tree = React.createClass({
     },
 
     componentDidMount: function() {
-      window.socket.emit('code', {filename: this.props.files[0].name});
     },
 
     updateDoc: function (doc, filename) {
