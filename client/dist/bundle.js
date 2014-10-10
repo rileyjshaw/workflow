@@ -4,12 +4,14 @@
 var React = require('react');
 var UI = require('./react/ui.jsx');
 
+var socket = io('http://localhost:49000');
+window.socket = socket;
+
 React.renderComponent(
   UI(null),
   document.getElementById('app-container')
 );
 
-/*
 window.addEventListener('load', function() {
 	var term = new Terminal({
 		colors: Terminal.colors,
@@ -21,13 +23,11 @@ window.addEventListener('load', function() {
 		cursorBlink: false
 	});
 
-	term.open(document.body);
+	term.open(document.getElementById('terminal'));
 
-	var socket = io('http://localhost:49000');
 	socket.on('connect', function() {
 		console.log('connect');
-		socket.on('data', function(data) {
-			console.log(data);
+		socket.on('term', function(data) {
 			term.write(data);
 		});
 		socket.on('event', function(data){});
@@ -35,10 +35,9 @@ window.addEventListener('load', function() {
 	});
 
 	term.on('data', function(data) {
-		socket.emit('data', data);
+		socket.emit('term', data);
 	});
 }, false);
-*/
 },{"./react/ui.jsx":160,"react":151}],2:[function(require,module,exports){
 /* ***** BEGIN LICENSE BLOCK *****
  * Distributed under the BSD license:
@@ -38097,6 +38096,11 @@ var Ace = React.createClass({displayName: 'Ace',
     this.props.setAce(ace.edit('ace'));
     this.props.ace.getSession().setMode('ace/mode/javascript');
     this.props.ace.setTheme('ace/theme/monokai');
+
+    window.socket.on('code', (function(data) {
+      this.props.ace.getSession().setValue(data);
+      this.props.ace.clearSelection();
+    }).bind(this));
   },
 
   componentWillUnmount: function () {
@@ -38105,7 +38109,8 @@ var Ace = React.createClass({displayName: 'Ace',
 
   render: function () {
     return (
-      React.DOM.div({id: "ace"}, "Editing!")
+      React.DOM.div({id: "ace"}
+      )
     );
   }
 });
@@ -38115,6 +38120,10 @@ var Tree = React.createClass({displayName: 'Tree',
         return {};
     },
 
+    componentDidMount: function() {
+      window.socket.emit('code', {filename: this.props.files[0].name});
+    },
+
     updateDoc: function (doc, filename) {
       var lang = this.props.ace.setDoc(doc, filename);
       this.setState({ lang: lang });
@@ -38122,15 +38131,13 @@ var Tree = React.createClass({displayName: 'Tree',
     },
 
     handleClick: function (i) {
-      return function () {
-        alert('You clicked file ' + i + '!');
-      }
+      window.socket.emit('code', {filename: this.props.files[i].name});
     },
 
     render: function () {
       var files = this.props.files.map((function (file, i) {
         return (
-          React.DOM.li({onClick: this.handleClick(i), key: file.key}, file.name)
+          React.DOM.li({onClick: this.handleClick.bind(this, i), key: file.key}, file.name)
         );
       }).bind(this));
 
@@ -38237,7 +38244,7 @@ var Terminal = React.createClass({displayName: 'Terminal',
   },
 
   render: function () {
-    return React.DOM.div({className: "terminal screen"});
+    return React.DOM.div({id: "terminal", className: "terminal screen"});
   }
 });
 
@@ -38306,20 +38313,12 @@ var UI = React.createClass({displayName: 'UI',
       focusRegion: null,
       files: [
         {
-          name: 'first.js',
+          name: 'index.js',
           key: 1
         },
         {
-          name: 'second.c',
+          name: 'package.json',
           key: 2
-        },
-        {
-          name: 'third.h',
-          key: 3
-        },
-        {
-          name: 'fourth.php',
-          key: 4
         }
       ],
       cards: stages[0].cards,

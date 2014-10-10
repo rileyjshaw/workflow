@@ -23,20 +23,12 @@ var UI = React.createClass({
       focusRegion: null,
       files: [
         {
-          name: 'first.js',
+          name: 'index.js',
           key: 1
         },
         {
-          name: 'second.c',
+          name: 'package.json',
           key: 2
-        },
-        {
-          name: 'third.h',
-          key: 3
-        },
-        {
-          name: 'fourth.php',
-          key: 4
         }
       ],
       cards: stages[0].cards,

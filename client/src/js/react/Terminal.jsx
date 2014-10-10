@@ -7,7 +7,7 @@ var Terminal = React.createClass({
   },
 
   render: function () {
-    return <div className='terminal screen' />;
+    return <div id='terminal' className='terminal screen' />;
   }
 });
 

@@ -37,6 +37,11 @@ var Ace = React.createClass({
     this.props.setAce(ace.edit('ace'));
     this.props.ace.getSession().setMode('ace/mode/javascript');
     this.props.ace.setTheme('ace/theme/monokai');
+
+    window.socket.on('code', (function(data) {
+      this.props.ace.getSession().setValue(data);
+      this.props.ace.clearSelection();
+    }).bind(this));
   },
 
   componentWillUnmount: function () {
@@ -45,7 +50,8 @@ var Ace = React.createClass({
 
   render: function () {
     return (
-      <div id='ace'>Editing!</div>
+      <div id='ace'>
+      </div>
     );
   }
 });
@@ -55,6 +61,10 @@ var Tree = React.createClass({
         return {};
     },
 
+    componentDidMount: function() {
+      window.socket.emit('code', {filename: this.props.files[0].name});
+    },
+
     updateDoc: function (doc, filename) {
       var lang = this.props.ace.setDoc(doc, filename);
       this.setState({ lang: lang });
@@ -62,15 +72,13 @@ var Tree = React.createClass({
     },
 
     handleClick: function (i) {
-      return function () {
-        alert('You clicked file ' + i + '!');
-      }
+      window.socket.emit('code', {filename: this.props.files[i].name});
     },
 
     render: function () {
       var files = this.props.files.map((function (file, i) {
         return (
-          <li onClick={this.handleClick(i)} key={file.key}>{file.name}</li>
+          <li onClick={this.handleClick.bind(this, i)} key={file.key}>{file.name}</li>
         );
       }).bind(this));
 

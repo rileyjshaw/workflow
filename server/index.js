@@ -2,11 +2,25 @@ var async = require('async');
 var pty = require('pty.js');
 var server = require('http').createServer();
 var io = require('socket.io')(server);
+var fs = require('fs');
 
 var Docker = require('dockerode');
 var docker = new Docker({socketPath: '/var/run/docker.sock'});
 
 var containers = {};
+
+// 172.17.42.1, port 3000
+
+// Load files
+var filenames = ['index.js', 'package.json'];
+var files = {};
+filenames.forEach(function(filename) {
+	fs.readFile('sampletask/code/' + filename, 'utf8', function(err, file) {
+		if (!err) {
+			files[filename] = file;
+		}
+	});
+})
 
 io.on('connection', function(socket) {
 	console.log('connection');
@@ -30,13 +44,16 @@ io.on('connection', function(socket) {
 				env: process.env
 			});
 
+			socket.emit('term', 'Welcome to the terminal\r\n');
+			socket.emit('term', 'This is a real linux box\r\n');
+
 			term.on('data', function(data) {
-				socket.emit('data', data);
+				socket.emit('term', data);
 			});
 
 			console.log(term.process);
 
-			socket.on('data', function(data) {
+			socket.on('term', function(data) {
 				term.write(data);
 			});
 
@@ -48,6 +65,14 @@ io.on('connection', function(socket) {
 					console.log('killed container ' + container.id);
 				});
 			});
+
+			socket.on('code', function(data) {
+				if (files[data.filename]) {
+					socket.emit('code', files[data.filename]);
+				}
+			});
+
+			socket.emit('code', 'test');
 		});
 	});
 });
