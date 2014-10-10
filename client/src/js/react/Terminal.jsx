@@ -12,7 +12,7 @@ var Terminal = React.createClass({
     e.preventDefault();
     if (this.state.numUsers === '3003') {
       this.props.advanceStage();
-    }
+    } else alert('Not quite!');
     return false;
   },
 

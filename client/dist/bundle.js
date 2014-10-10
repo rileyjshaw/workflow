@@ -38258,7 +38258,7 @@ var Terminal = React.createClass({displayName: 'Terminal',
     e.preventDefault();
     if (this.state.numUsers === '3003') {
       this.props.advanceStage();
-    }
+    } else alert('Not quite!');
     return false;
   },
 
