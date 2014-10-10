@@ -38302,7 +38302,7 @@ var stages = require('../stages.jsx');
 var UI = React.createClass({displayName: 'UI',
   getInitialState: function () {
     return {
-      activeScreen: 'instruction',
+      activeScreen: 'editor',
       timeRemaining: 11655,
       currentTask: stages[0].title,
       brandColor: '#00b4ae',
