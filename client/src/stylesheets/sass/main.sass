@@ -1,0 +1,99 @@
+@import variables
+@import card
+
+body
+  font-weight: 300
+  font-family: Lato, sans-serif
+  color: #333
+
+.topBar
+  position: absolute
+  left: 0
+  height: $topBarHeight
+  line-height: $topBarHeight
+  width: 100%
+  box-sizing: border-box
+  padding: 0 1em
+  color: $cbg
+  background: $cbg - #ccc
+
+  p
+    margin: 0
+
+  .logo
+    height: 70%
+    margin-top: $topBarHeight * 0.15
+    margin-right: 1em
+    display: inline-block
+
+  .logo, .currentTask
+    float: left
+
+  .timeRemaining
+    float: right
+
+.instructionActive .instruction, .editorActive .editor, .terminalActive .terminal, .settingsActive .settings
+  display: block
+
+.screen, .screenTabBar, .editor .ace_editor, .tree
+  position: absolute
+  bottom: 0
+
+.screen, .screenTabBar
+  top: $topBarHeight
+
+.screen
+  left: $sideBarWidth
+  right: 0
+  display: none
+  overflow: hidden
+  background: $cbg
+
+.screenTabBar, .tree
+  margin: 0
+  padding: 0
+  left: 0
+  list-style: none
+
+.screenTabBar
+  overflow: hidden
+  width: $sideBarWidth
+  background: $cbg - #080808
+  box-shadow: -4px 0 4px rgba($cbg - #222, 0.2) inset
+
+  li
+    position: relative
+    height: $sideBarWidth
+    width: $sideBarWidth
+    cursor: pointer
+    color: white
+    transition: background 0.2s, box-shadow 0.2s
+
+    &:first-child
+      box-shadow: 0 4px 4px rgba($cbg - #222, 0.2) inset
+
+    &.active, &:hover
+      background-color: $cbg !important
+      box-shadow: 0 4px 4px rgba($cbg - #222, 0.2), 0 -4px 4px rgba($cbg - #222, 0.2)
+
+    &.active + :hover, &:hover + .active
+      z-index: 1
+      box-shadow: 0 4px 4px rgba($cbg - #222, 0.2)
+
+.topBar, .editor .ace_editor, .tree
+  top: 0
+
+.editor
+  .ace_editor
+    left: $gutterWidth
+    right: 0
+
+  .tree
+    width: $gutterWidth
+    background: $cbg
+
+.backdrop
+  position: fixed
+  top: $topBarHeight
+  left: 0
+  opacity: 0.96
