@@ -4,6 +4,10 @@ var React = require('react');
 module.exports = [
   {
     title: 'Introduction: How many users?',
+    screens: ['instruction', 'terminal', 'settings'],
+    hints: [
+      'Use Curl'
+    ],
     cards: [
       {
         content: <div className='inner'>
@@ -73,6 +77,7 @@ module.exports = [
   },
   {
     title: 'Add an endpoint',
+    screens: ['instruction', 'editor', 'settings'],
     cards: [
       {
         content: <div className='inner'>

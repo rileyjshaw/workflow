@@ -13,7 +13,7 @@ var ScreenTabBar = React.createClass({
   },
 
   render: function () {
-    var tabs = ['instruction', 'editor', 'terminal', 'settings'].map((function (tabName) {
+    var tabs = this.props.screens.map((function (tabName) {
       return (
         <li
           onClick={this.changeScreen(tabName)}
