@@ -4,7 +4,7 @@
 var React = require('react');
 var UI = require('./react/ui.jsx');
 
-var socket = io('http://localhost:49000');
+var socket = io('http://104.131.157.163:3001');
 window.socket = socket;
 
 React.renderComponent(
@@ -38,7 +38,7 @@ window.addEventListener('load', function() {
 		socket.emit('term', data);
 	});
 
-     window.socket.emit('code', {filename: this.props.files[0].name});
+	window.socket.emit('code', {filename: this.props.files[0].name});
 }, false);
 },{"./react/ui.jsx":160,"react":151}],2:[function(require,module,exports){
 /* ***** BEGIN LICENSE BLOCK *****

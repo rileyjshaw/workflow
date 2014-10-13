@@ -20,12 +20,12 @@ filenames.forEach(function(filename) {
 			files[filename] = file;
 		}
 	});
-})
+});
 
 io.on('connection', function(socket) {
 	console.log('connection');
 
-	docker.createContainer({Image: 'neeraj/interview', Cmd: ['/sbin/init']}, function (err, container) {
+	docker.createContainer({Image: 'realwork/task1', Cmd: ['/sbin/init']}, function (err, container) {
 		if (err) {
 			console.error(err);
 			return;
@@ -90,4 +90,4 @@ process.on('SIGINT', function() {
 	});
 });
 
-server.listen(49000);
+server.listen(3001);
