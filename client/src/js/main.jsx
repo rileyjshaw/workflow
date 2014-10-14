@@ -3,7 +3,7 @@
 var React = require('react');
 var UI = require('./react/ui.jsx');
 
-var socket = io('http://104.131.157.163:3001');
+var socket = io('http://ws.useworkflow.com');
 window.socket = socket;
 
 React.renderComponent(
