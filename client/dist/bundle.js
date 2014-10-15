@@ -11,39 +11,6 @@ React.renderComponent(
   UI(null),
   document.getElementById('app-container')
 );
-<<<<<<< HEAD
-=======
-
-window.addEventListener('load', function() {
-  var term = new Terminal({
-    colors: Terminal.colors,
-    cols: 80,
-    rows: 24,
-    convertEol: false,
-    useStyle: true,
-    screenKeys: true,
-    cursorBlink: false
-  });
-
-  term.open(document.getElementById('terminal'));
-
-  socket.on('connect', function() {
-    console.log('connect');
-    socket.on('term', function(data) {
-      term.write(data);
-    });
-    socket.on('event', function(data){});
-    socket.on('disconnect', function(){});
-  });
-
-  term.on('data', function(data) {
-    socket.emit('term', data);
-  });
-
-  window.socket.emit('code', {filename: 'index.js'});
-}, false);
-
->>>>>>> a116e500e3d86613b59749b48d652848858da849
 },{"./react/ui.jsx":160,"react":151}],2:[function(require,module,exports){
 /* ***** BEGIN LICENSE BLOCK *****
  * Distributed under the BSD license:
