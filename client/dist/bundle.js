@@ -38162,21 +38162,21 @@ var Instruction = React.createClass({displayName: 'Instruction',
   render: function () {
     return (
       React.DOM.div({className: "instruction screen"}, 
-        React.DOM.h1(null, "Lyft API, v0.0.0_alpha"), 
+        React.DOM.h1(null, "Truth API, v0"), 
         React.DOM.p(null, "The API is running internally at address ", React.DOM.code(null, "172.17.42.1"), ", port ", React.DOM.code(null, "49001"), "."), 
         React.DOM.h2(null, "Endpoints"), 
-        React.DOM.h3(null, "/activeDrivers"), 
-        React.DOM.p(null, "Returns a JSON object containing a list of all currently active driver names"), 
-        this.props.currentStageIndex === 1 ? React.DOM.h3(null, "/isThisLyft") : '', 
-        this.props.currentStageIndex === 1 ? React.DOM.p(null, "Returns the string YES") : '', 
+        React.DOM.h3(null, "/citizens"), 
+        React.DOM.p(null, "Returns a JSON object containing all Oceania citizen names"), 
         React.DOM.h3(null, "/locations"), 
-        React.DOM.p(null, "Returns a JSON object containing a list of all driver locations in the form:"), 
+        React.DOM.p(null, "Returns a JSON object containing a list of all citizen locations in the form:"), 
         React.DOM.code(null, React.DOM.pre(null, '{', 
   "lat: 37.4524," + ' ' +
   "long: -122.1161", 
 '}')), 
-        React.DOM.h3(null, "/users"), 
-        React.DOM.p(null, "Returns a JSON object containing a list of all user names currently using Lyft")
+        React.DOM.h3(null, "/maxims"), 
+        React.DOM.p(null, "Returns a JSON object containing the Ingsoc Party maxims"), 
+        this.props.currentStageIndex === 1 ? React.DOM.h3(null, "/twoplustwo") : '', 
+        this.props.currentStageIndex === 1 ? React.DOM.p(null, "Returns 5") : ''
       )
     );
   }
@@ -38340,7 +38340,7 @@ var UI = React.createClass({displayName: 'UI',
       currentStage: stages[0],
       currentTask: stages[0].title,
       hints: stages[0].hints,
-      brandColor: '#00b4ae',
+      brandColor: '#04bac6',
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
       focusRegion: null,
@@ -38482,7 +38482,7 @@ module.exports = UI;
 // down the rabbit hole we go...
 module.exports = [
   {
-    title: 'Introduction: How many users?',
+    title: 'Introduction: How many citizens?',
     screens: ['instruction', 'terminal', 'settings'],
     hints: [
       'Use Curl',
@@ -38491,25 +38491,24 @@ module.exports = [
     cards: [
       {
         content: React.DOM.div({className: "inner"}, 
-          React.DOM.h1(null, "Hi, Chris!"), 
-          React.DOM.p(null, "Ride by ride, we’re changing the way our world works. We imagine a world where cities feel small again. Where transportation and tech bring people together, instead of apart. We see the future as community-driven — and it starts with you."), 
-          React.DOM.img({src: "img/moustache.png", alt: "Lyft moustache"})
+          React.DOM.h1(null, "Hi, Winston!"), 
+          React.DOM.p(null, "Here at the Ministry of Truth, we’re redefining what it means to be a citizen of Oceania. We concern ourselves with news media, entertainment, the fine arts and educational books. We’re second to none in the pursuit of excellence, from the top down."), 
+          React.DOM.img({className: "globe", src: "img/globe.png", alt: "The Ministry of Truth globe"})
         )
       }, {
         content: React.DOM.div({className: "inner"}, 
-          React.DOM.p(null, "We’re working on Google scale engineering", React.DOM.br(null), "challenges with the speed of a startup."), 
-          React.DOM.p(null, "With your background in ", React.DOM.strong(null, "Node.js"), ", we think that", React.DOM.br(null), "you’ll make a great infrastructure engineer!"), 
+          React.DOM.p(null, "We’re working on Ingsoc scale engineering", React.DOM.br(null), "challenges with the speed of a startup."), 
+          React.DOM.p(null, "With your background in ", React.DOM.strong(null, "Node.js"), ", we think that", React.DOM.br(null), "you’ll make a great information architecht!"), 
           React.DOM.p(null, "Today we’re going to walk you through a few situations that you might come across on the job.")
         )
       }, {
         content: React.DOM.div({className: "inner"}, 
-        React.DOM.p(null, "Our infrastructure engineers work on:"), 
+        React.DOM.p(null, "Our information architechts work on:"), 
           React.DOM.ul(null, 
-            React.DOM.li(null, "Race conditionsin a real-time server environment"), 
             React.DOM.li(null, "Complex, predictive matching algorithms with machine learning"), 
             React.DOM.li(null, "Custom recruitment, onboarding and scheduling tools"), 
-            React.DOM.li(null, "Integration with 3rd party services for identity, payment, notifications and monitoring"), 
-            React.DOM.li(null, "Optimizing data layout in a schema-less database environment")
+            React.DOM.li(null, "Maintaining and restoring historical documents"), 
+            React.DOM.li(null, "Reducing bloat in our dynamic historical database environment")
           ), 
           React.DOM.p(null, "We code mostly in Python, but we can get you up to speed in no time.")
         )
@@ -38525,7 +38524,7 @@ module.exports = [
         content: React.DOM.div({className: "inner"}, 
           React.DOM.p(null, "Use the terminal pane:"), 
           React.DOM.img({src: "img/terminal.svg", alt: "terminal icon"}), 
-          React.DOM.p(null, "To figure out how many users Lyft currently has.")
+          React.DOM.p(null, "To figure out how many citizens reside in Oceania.")
         )
       }, {
         focus: '.timeRemaining',
@@ -38536,20 +38535,21 @@ module.exports = [
       }, {
         focus: '.hintButton',
         content: React.DOM.div({className: "inner"}, 
-          React.DOM.p(null, "You can use the Hint button at any time to", React.DOM.br(null), "steer you in the right direction."), 
+          React.DOM.p(null, "You can use the ", React.DOM.strong(null, "Hint"), " button at any time to", React.DOM.br(null), "steer you in the right direction."), 
           React.DOM.p(null, "Try to use it sparingly; we want to see how ", React.DOM.em(null, "you"), " solve problems.")
         )
       }, {
         focus: '.topBar .left',
         content: React.DOM.div({className: "inner"}, 
-          React.DOM.p(null, "If you ever need to see these cards again, just", React.DOM.br(null), "click the Lyft logo in the top left.")
+          React.DOM.p(null, "If you ever need to see these cards again, just", React.DOM.br(null), "click the the Ministry of Truth logo in the top left."), 
+          React.DOM.img({className: "logo", src: "img/logo.png", alt: "The Ministry of Truth globe"})
         )
       }, {
         focus: '.instructionTab, .terminalTab',
         content: React.DOM.div({className: "inner"}, 
           React.DOM.p(null, "Alright, time to get started!"), 
-          React.DOM.p(null, "Remember, we’re looking for ", React.DOM.strong(null, "how many users Lyft currently has"), ". Our API will be available at the internal address ", React.DOM.strong(null, "172.17.42.1"), " on port ", React.DOM.strong(null, "49100"), ". You’ll find everything else in the info pane."), 
-          React.DOM.img({src: "img/moustache.png", alt: "Lyft moustache"}), 
+          React.DOM.p(null, "Remember, we’re looking for ", React.DOM.strong(null, "how many citizens live in Oceania"), ". Our API will be available at the internal address ", React.DOM.strong(null, "172.17.42.1"), " on port ", React.DOM.strong(null, "49100"), ". You’ll find everything else in the info pane."), 
+          React.DOM.img({className: "globe", src: "img/globe.png", alt: "The Ministry of Truth globe"}), 
           React.DOM.p(null, React.DOM.strong(null, "Good luck!"))
         )
       }
@@ -38569,9 +38569,9 @@ module.exports = [
       {
         focus: '.timeRemaining',
         content: React.DOM.div({className: "inner"}, 
-          React.DOM.p(null, "Now that you’re familiar with the Lyft API, let’s try adding to it."), 
-          React.DOM.p(null, "For starters, let’s make a simple endpoint called ", React.DOM.code(null, "isThisLyft"), " that always returns the string ", React.DOM.em(null, React.DOM.strong(null, "YES"))), 
-          React.DOM.p(null, "We’re exposing a new ", React.DOM.strong(null, "editor pane"), " so that you can play with the server. The API is written in express."), 
+          React.DOM.p(null, "Now that you’re familiar with the the Truth API, let’s try adding to it."), 
+          React.DOM.p(null, "For starters, let’s make a simple endpoint called ", React.DOM.code(null, "twoplustwo"), " that always returns the number ", React.DOM.em(null, React.DOM.strong(null, "5"))), 
+          React.DOM.p(null, "We’re exposing a new ", React.DOM.strong(null, "editor pane"), " so that you can play with the server. The API is written using express."), 
           React.DOM.img({src: "img/editor.svg", alt: "editor icon"})
         )
       }

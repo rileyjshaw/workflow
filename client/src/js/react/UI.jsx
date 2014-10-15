@@ -18,7 +18,7 @@ var UI = React.createClass({
       currentStage: stages[0],
       currentTask: stages[0].title,
       hints: stages[0].hints,
-      brandColor: '#00b4ae',
+      brandColor: '#04bac6',
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
       focusRegion: null,
