@@ -8,37 +8,41 @@ var socket = io('http://ws.useworkflow.com');
 window.socket = socket;
 
 React.renderComponent(
-  UI(null),
+  React.DOM.span({className: "loading"}, 
+    React.DOM.div({className: "top"}), 
+    React.DOM.div({className: "bottom"}), 
+    React.DOM.div({className: "line"})
+  ),
   document.getElementById('app-container')
 );
 
 window.addEventListener('load', function() {
-	var term = new Terminal({
-		colors: Terminal.colors,
-		cols: 80,
-		rows: 24,
-		convertEol: false,
-		useStyle: true,
-		screenKeys: true,
-		cursorBlink: false
-	});
+  var term = new Terminal({
+    colors: Terminal.colors,
+    cols: 80,
+    rows: 24,
+    convertEol: false,
+    useStyle: true,
+    screenKeys: true,
+    cursorBlink: false
+  });
 
-	term.open(document.getElementById('terminal'));
+  term.open(document.getElementById('terminal'));
 
-	socket.on('connect', function() {
-		console.log('connect');
-		socket.on('term', function(data) {
-			term.write(data);
-		});
-		socket.on('event', function(data){});
-		socket.on('disconnect', function(){});
-	});
+  socket.on('connect', function() {
+    console.log('connect');
+    socket.on('term', function(data) {
+      term.write(data);
+    });
+    socket.on('event', function(data){});
+    socket.on('disconnect', function(){});
+  });
 
-	term.on('data', function(data) {
-		socket.emit('term', data);
-	});
+  term.on('data', function(data) {
+    socket.emit('term', data);
+  });
 
-	window.socket.emit('code', {filename: this.props.files[0].name});
+  window.socket.emit('code', {filename: this.props.files[0].name});
 }, false);
 },{"./react/ui.jsx":160,"react":151}],2:[function(require,module,exports){
 /* ***** BEGIN LICENSE BLOCK *****
