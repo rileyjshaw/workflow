@@ -17,7 +17,7 @@ app.get('/', function(req, res) {
 	res.send('Coming soon');
 });
 
-app.use('/demo', express.static(__dirname + '/../client/dist'));
+app.use('/helloyc', express.static(__dirname + '/../client/dist'));
 
 // 172.17.42.1, port 3000
 // Load files
