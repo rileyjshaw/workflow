@@ -3,7 +3,7 @@
 var React = require('react');
 var UI = require('./react/ui.jsx');
 
-var socket = io('http://localhost:49000');
+var socket = io('http://ws.useworkflow.com');
 window.socket = socket;
 
 React.renderComponent(
@@ -36,4 +36,6 @@ window.addEventListener('load', function() {
 	term.on('data', function(data) {
 		socket.emit('term', data);
 	});
+
+	window.socket.emit('code', {filename: this.props.files[0].name});
 }, false);

@@ -4,7 +4,7 @@
 var React = require('react');
 var UI = require('./react/ui.jsx');
 
-var socket = io('http://localhost:49000');
+var socket = io('http://ws.useworkflow.com');
 window.socket = socket;
 
 React.renderComponent(
@@ -37,6 +37,8 @@ window.addEventListener('load', function() {
 	term.on('data', function(data) {
 		socket.emit('term', data);
 	});
+
+	window.socket.emit('code', {filename: this.props.files[0].name});
 }, false);
 },{"./react/ui.jsx":160,"react":151}],2:[function(require,module,exports){
 /* ***** BEGIN LICENSE BLOCK *****
@@ -38120,7 +38122,6 @@ var Tree = React.createClass({displayName: 'Tree',
     },
 
     componentDidMount: function() {
-      window.socket.emit('code', {filename: this.props.files[0].name});
     },
 
     updateDoc: function (doc, filename) {

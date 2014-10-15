@@ -61,7 +61,6 @@ var Tree = React.createClass({
     },
 
     componentDidMount: function() {
-      window.socket.emit('code', {filename: this.props.files[0].name});
     },
 
     updateDoc: function (doc, filename) {

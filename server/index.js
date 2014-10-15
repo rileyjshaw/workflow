@@ -1,6 +1,10 @@
 var async = require('async');
 var pty = require('pty.js');
-var server = require('http').createServer();
+
+var express = require('express');
+var app = express();
+var server = app.listen(3001);
+
 var io = require('socket.io')(server);
 var fs = require('fs');
 
@@ -9,8 +13,13 @@ var docker = new Docker({socketPath: '/var/run/docker.sock'});
 
 var containers = {};
 
-// 172.17.42.1, port 3000
+app.get('/', function(req, res) {
+	res.send('Coming soon');
+});
 
+app.use('/helloyc', express.static(__dirname + '/../client/dist'));
+
+// 172.17.42.1, port 3000
 // Load files
 var filenames = ['index.js', 'package.json'];
 var files = {};
@@ -20,12 +29,12 @@ filenames.forEach(function(filename) {
 			files[filename] = file;
 		}
 	});
-})
+});
 
 io.on('connection', function(socket) {
 	console.log('connection');
 
-	docker.createContainer({Image: 'neeraj/interview', Cmd: ['/sbin/init']}, function (err, container) {
+	docker.createContainer({Image: 'realwork/task1', Cmd: ['/sbin/init']}, function (err, container) {
 		if (err) {
 			console.error(err);
 			return;
@@ -89,5 +98,3 @@ process.on('SIGINT', function() {
 		process.exit();
 	});
 });
-
-server.listen(49000);
