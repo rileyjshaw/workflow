@@ -37,5 +37,5 @@ window.addEventListener('load', function() {
 		socket.emit('term', data);
 	});
 
-	window.socket.emit('code', {filename: this.props.files[0].name});
+	window.socket.emit('code', {filename: 'index.js'});
 }, false);

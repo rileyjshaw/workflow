@@ -38,7 +38,7 @@ window.addEventListener('load', function() {
 		socket.emit('term', data);
 	});
 
-	window.socket.emit('code', {filename: this.props.files[0].name});
+	window.socket.emit('code', {filename: 'index.js'});
 }, false);
 },{"./react/ui.jsx":160,"react":151}],2:[function(require,module,exports){
 /* ***** BEGIN LICENSE BLOCK *****
