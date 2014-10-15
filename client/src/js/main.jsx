@@ -7,11 +7,7 @@ var socket = io('http://ws.useworkflow.com');
 window.socket = socket;
 
 React.renderComponent(
-  <span className="loading">
-    <div className="top"></div>
-    <div className="bottom"></div>
-    <div className="line"></div>
-  </span>,
+  <UI />,
   document.getElementById('app-container')
 );
 
@@ -41,5 +37,5 @@ window.addEventListener('load', function() {
     socket.emit('term', data);
   });
 
-  window.socket.emit('code', {filename: this.props.files[0].name});
+  window.socket.emit('code', {filename: 'index.js'});
 }, false);

@@ -8,11 +8,7 @@ var socket = io('http://ws.useworkflow.com');
 window.socket = socket;
 
 React.renderComponent(
-  React.DOM.span({className: "loading"}, 
-    React.DOM.div({className: "top"}), 
-    React.DOM.div({className: "bottom"}), 
-    React.DOM.div({className: "line"})
-  ),
+  UI(null),
   document.getElementById('app-container')
 );
 
@@ -42,8 +38,9 @@ window.addEventListener('load', function() {
     socket.emit('term', data);
   });
 
-  window.socket.emit('code', {filename: this.props.files[0].name});
+  window.socket.emit('code', {filename: 'index.js'});
 }, false);
+
 },{"./react/ui.jsx":160,"react":151}],2:[function(require,module,exports){
 /* ***** BEGIN LICENSE BLOCK *****
  * Distributed under the BSD license:
