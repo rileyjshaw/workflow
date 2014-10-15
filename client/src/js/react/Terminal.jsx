@@ -8,6 +8,35 @@ var Terminal = React.createClass({
     };
   },
 
+  componentDidMount: function() {
+	var term = new window.Terminal({
+		colors: Terminal.colors,
+		cols: 80,
+		rows: 24,
+		convertEol: false,
+		useStyle: true,
+		screenKeys: true,
+		cursorBlink: false
+	});
+
+	term.open(document.getElementById('terminal'));
+
+	window.socket.on('connect', function() {
+		console.log('connect');
+		window.socket.on('term', function(data) {
+			term.write(data);
+		});
+		window.socket.on('event', function(data){});
+		window.socket.on('disconnect', function(){});
+	});
+
+	term.on('data', function(data) {
+		window.socket.emit('term', data);
+	});
+
+	window.socket.emit('code', {filename: 'index.js'});
+  },
+
   answer: function (e) {
     e.preventDefault();
     if (this.state.numUsers === '3003') {
